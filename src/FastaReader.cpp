@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <exception>
 #include <Filesystem.hpp>
-#include "boost/algorithm/string.hpp"
 
 using std::unordered_map;
 using std::runtime_error;
@@ -23,9 +22,6 @@ using std::runtime_error;
 using ghc::filesystem::path;
 using ghc::filesystem::exists;
 using ghc::filesystem::absolute;
-using boost::trim_left_if;
-using boost::trim_right;
-using boost::split;
 
 
 void get_vector_from_index_map(vector< pair <string,FastaIndex> >& items, unordered_map<string,FastaIndex>& map_object){
@@ -99,9 +95,7 @@ void FastaReader::read_next_header(SequenceElement& element){
 
     // Verify that header starts with header symbol '>', and trim the symbol from the line. Also trim trailing space.
     if (element.name[0] == this->header_symbol){
-        trim_left_if(element.name, &is_caret);
-//        trim_right(element.name);
-        element.name = element.name.substr(0,element.name.find_first_of(' '));
+        element.name = element.name.substr(1,element.name.find_first_of(' ') - 1);
     }
     else{
         throw runtime_error("Unrecognized FASTA header character on line: " + to_string(this->line_index));
@@ -131,7 +125,9 @@ void FastaReader::read_next_sequence(SequenceElement& element){
         this->line_index++;
 
         // Trim any trailing whitespace on the sequence line
-        trim_right(element.sequence);
+        while(isspace(element.sequence.back())){
+            element.sequence.resize(element.sequence.size()-1);
+        }
 
         // Update class status
         if (this->fasta_file.peek() == EOF){
