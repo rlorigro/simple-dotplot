@@ -51,7 +51,7 @@ char complement(char c){
         return 'A';
     }
     else {
-        throw runtime_error("ERROR: non DNA character cannot be complemented: " + c);
+        throw runtime_error("ERROR: non DNA character cannot be complemented: " + string(1,c));
     }
 }
 
