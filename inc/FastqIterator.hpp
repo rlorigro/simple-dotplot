@@ -1,13 +1,13 @@
 #ifndef SIMPLE_DOTPLOT_FASTQITERATOR_HPP
 #define SIMPLE_DOTPLOT_FASTQITERATOR_HPP
 
-#include <experimental/filesystem>
+#include <Filesystem.hpp>
 #include <fstream>
 #include <string>
 #include <vector>
 
-using std::experimental::filesystem::create_directories;
-using std::experimental::filesystem::path;
+using ghc::filesystem::create_directories;
+using ghc::filesystem::path;
 using std::ifstream;
 using std::to_string;
 using std::string;

@@ -22,8 +22,8 @@ set(CMAKE_CXX_FLAGS )
 set(CMAKE_CXX_FLAGS "-fsanitize=address -fexceptions")  # leak checking and address sanitization
 #set(CMAKE_CXX_FLAGS "-fexceptions")
 
-add_definitions(-ggdb3 -O0 -Wall)       # Debugging + No optimization
-#add_definitions(-O3 -Wall)              # Much optimization
+#add_definitions(-ggdb3 -O0 -Wall)       # Debugging + No optimization
+add_definitions(-O3 -Wall)              # Much optimization
 
 # Definitions needed to eliminate runtime dependency
 # on the boost system library.
@@ -121,16 +121,11 @@ message(STATUS "INSTALL_DIR: ${INSTALL_DIR}")
 ############################################
 
 
-# stupid "experimental" filesystem library for gcc <8.0
-link_libraries(stdc++fs)
-
-
 # -------- TESTS --------
 
 set(TESTS
         test_mummer
         test_cli
-        test_path
         )
 
 foreach(FILENAME_PREFIX ${TESTS})
@@ -138,7 +133,6 @@ foreach(FILENAME_PREFIX ${TESTS})
     target_link_libraries(${FILENAME_PREFIX}
             simple_dotplot
             mummer4
-            stdc++fs
             )
 
 endforeach()
@@ -155,7 +149,6 @@ foreach(FILENAME_PREFIX ${EXECUTABLES})
     target_link_libraries(${FILENAME_PREFIX}
             simple_dotplot
             mummer4
-            stdc++fs
             )
 
 endforeach()

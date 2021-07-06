@@ -1,7 +1,7 @@
 #ifndef SIMPLE_DOTPLOT_FASTAREADER_HPP
 #define SIMPLE_DOTPLOT_FASTAREADER_HPP
 
-#include <experimental/filesystem>
+#include <Filesystem.hpp>
 #include "SequenceElement.hpp"
 #include <unordered_map>
 #include <utility>
@@ -10,8 +10,8 @@
 #include <iostream>
 #include <fstream>
 
-using std::experimental::filesystem::create_directories;
-using std::experimental::filesystem::path;
+using ghc::filesystem::create_directories;
+using ghc::filesystem::path;
 using std::unordered_map;
 using std::pair;
 using std::vector;

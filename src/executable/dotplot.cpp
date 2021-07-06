@@ -7,7 +7,7 @@
 using simple_dotplot::FastqElement;
 using simple_dotplot::FastqIterator;
 
-#include <experimental/filesystem>
+#include <Filesystem.hpp>
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
@@ -18,8 +18,8 @@ using simple_dotplot::FastqIterator;
 #include <cmath>
 #include <map>
 
-using std::experimental::filesystem::create_directories;
-using std::experimental::filesystem::path;
+using ghc::filesystem::create_directories;
+using ghc::filesystem::path;
 using std::sort;
 using std::runtime_error;
 using std::ifstream;
@@ -83,18 +83,6 @@ int64_t find_matches(string& ref_sequence,
         }
     });
 
-    // Query the reverse orientation as well (disabled for cleaner, more interpretable plots)
-//    string rc_query_sequence;
-//    reverse_complement(query_sequence, rc_query_sequence);
-//
-//    matcher.findMEM_each(rc_query_sequence, min_length, false, [&](const mummer::mummer::match_t& match){
-//        matches.emplace_back(match);
-//
-//        for (int64_t m=0; m<match.len; m+=50) {
-//            accumulator(match.ref);
-//        }
-//    });
-
     return accumulator.get_mean();
 }
 
@@ -107,7 +95,7 @@ void plot_matches_as_heatmap(
         bool mask_diagonal,
         path output_path){
 
-    const size_t size = 800;
+    const size_t size = 1000;
     vector <vector <size_t> > matrix(size, vector<size_t>(size, 0));
 
     int64_t x_offset = 0;
@@ -132,6 +120,8 @@ void plot_matches_as_heatmap(
                 continue;
             }
 
+//            cerr << "\n---- " << match.ref << " " << match.query << " " << match.len << " ----\n";
+
             double m=0;
             while (true) {
                 m += double(total_size)/double(size);
@@ -140,13 +130,13 @@ void plot_matches_as_heatmap(
                     break;
                 }
 
-                cerr << m << " " << match.len << '\n';
+                auto x = double(match.ref) + m + double(x_offset);
+                auto y = double(match.query) + m + double(y_offset);
 
-                auto x = match.ref + int64_t(floor(m)) + x_offset;
-                auto y = match.query + int64_t(floor(m)) + y_offset;
+                size_t x_bin = round((double(x)/double(total_size))*double(size));
+                size_t y_bin = round((double(y)/double(total_size))*double(size));
 
-                size_t x_bin = (double(x)/double(total_size))*double(size);
-                size_t y_bin = (double(y)/double(total_size))*double(size);
+//                cerr << m << " " << match.len << " " << x << " " << y << " " << x_bin << " " << y_bin << '\n';
 
                 if (x_bin >= matrix.size()){
                     break;
@@ -169,14 +159,16 @@ void plot_matches_as_heatmap(
 
     cerr << "total length: " << y_offset << '\n';
 
-    size_t max_density = 0;
+    size_t max_observed_match_length = 0;
     for (size_t i=0; i<size; i++){
         for (size_t j=0; j<size; j++){
-            if (matrix[i][j] > max_density){
-                max_density = matrix[i][j];
+            if (matrix[i][j] > max_observed_match_length){
+                max_observed_match_length = matrix[i][j];
             }
         }
     }
+
+    cerr << "Maximum length match observed: " << max_observed_match_length << '\n';
 
     Viridis color_map;
 
@@ -193,7 +185,7 @@ void plot_matches_as_heatmap(
     for (size_t i=0; i<size; i++){
         for (size_t j=0; j<size; j++){
             auto match_density = matrix[i][j];
-            auto normalized_density = log(double(match_density) + 1)/log(double(max_density) + 1);
+            auto normalized_density = log(double(match_density) + 1)/log(double(max_observed_match_length) + 1);
             auto color = color_map.get_rgb(normalized_density);
 
             file << int(color[0]*255) << ' ' << int(color[1]*255) << ' ' << int(color[2]*255) << "    ";
@@ -290,7 +282,7 @@ void dotplot(path ref_path, path query_path, int64_t min_length, bool mask_diago
         throw runtime_error("ERROR: output directory already exists");
     }
     else{
-        create_directories(std::experimental::filesystem::absolute(output_directory));
+        create_directories(ghc::filesystem::absolute(output_directory));
     }
 
     if (ref_path.extension() == ".fastq" and query_path.extension() == ".fastq"){

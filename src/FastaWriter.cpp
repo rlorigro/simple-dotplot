@@ -2,7 +2,7 @@
 
 #include <string>
 #include <stdexcept>
-#include <experimental/filesystem>
+#include <Filesystem.hpp>
 
 using std::string;
 using std::to_string;
@@ -10,8 +10,8 @@ using std::cout;
 using std::ofstream;
 using std::vector;
 using std::runtime_error;
-using std::experimental::filesystem::path;
-using std::experimental::filesystem::create_directories;
+using ghc::filesystem::create_directories;
+using ghc::filesystem::path;
 
 
 FastaWriter::FastaWriter(path file_path) {
