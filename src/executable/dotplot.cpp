@@ -126,15 +126,15 @@ void plot_matches_as_heatmap(
 
 //            cerr << "\n---- " << match.ref << " " << match.query << " " << match.len << " ----\n";
 
-            double m=0;
+            double m=0.00001;
             while (true) {
                 m += double(total_size)/double(size);
 
                 auto x = double(match.ref) + m + double(x_offset);
                 auto y = double(match.query) + m + double(y_offset);
 
-                size_t x_bin = round((double(x)/double(total_size))*double(size));
-                size_t y_bin = round((double(y)/double(total_size))*double(size));
+                size_t x_bin = round((double(x)/double(total_size))*double(size)) - 1;
+                size_t y_bin = round((double(y)/double(total_size))*double(size)) - 1;
 
 //                cerr << m << " " << match.len << " " << x << " " << y << " " << x_bin << " " << y_bin << '\n';
 
