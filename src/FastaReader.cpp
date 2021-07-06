@@ -1,6 +1,4 @@
 #include "FastaReader.hpp"
-#include "htslib/faidx.h"
-#include "htslib/hts.h"
 #include <unordered_map>
 #include <vector>
 #include <string>
