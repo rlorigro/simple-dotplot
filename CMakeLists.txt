@@ -96,9 +96,9 @@ ExternalProject_Add(project_mummer
 ExternalProject_Get_Property(project_mummer INSTALL_DIR)
 
 # Create new library for external project (so it can be linked with main library)
-add_library(mummer4 SHARED IMPORTED)
+add_library(mummer4 STATIC IMPORTED)
 set_property(TARGET mummer4
-        PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/lib/libumdmummer.so)
+        PROPERTY IMPORTED_LOCATION ${INSTALL_DIR}/lib/libumdmummer.a)
 
 # Define main library as dependent on the downloaded project (transitively)
 add_dependencies(mummer4
