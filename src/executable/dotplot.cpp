@@ -114,7 +114,11 @@ void plot_matches_as_heatmap(
     }
 
     for (const auto& item: matches){
-        for (auto& match: item.second){
+
+        cerr << "Plotting " << names.at(item.first) << " with length " << query_sizes.at(item.first) << '\n';
+        cerr << "Matches found: " << item.second.size() << '\n';
+
+        for (const auto& match: item.second){
             // If the user wants to ignore matches on the diagonal, then skip
             if (match.ref == match.query and mask_diagonal){
                 continue;
@@ -125,10 +129,6 @@ void plot_matches_as_heatmap(
             double m=0;
             while (true) {
                 m += double(total_size)/double(size);
-
-                if (m > match.len){
-                    break;
-                }
 
                 auto x = double(match.ref) + m + double(x_offset);
                 auto y = double(match.query) + m + double(y_offset);
@@ -150,10 +150,13 @@ void plot_matches_as_heatmap(
                 if (size_t(match.len) > matrix[x_bin][y_bin]){
                     matrix[x_bin][y_bin] = match.len;
                 }
+
+                if (m > match.len){
+                    break;
+                }
             }
         }
 
-        cerr << "Plotting " << names.at(item.first) << " with length " << query_sizes.at(item.first) << '\n';
         y_offset += query_sizes.at(item.first);
     }
 
