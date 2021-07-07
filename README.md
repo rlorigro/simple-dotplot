@@ -1,5 +1,5 @@
 # simple-dotplot
-Very simple and configurable all-in-one dotplot program. No system dependencies other than make, CMake v3.10, and C++17. Create a dotplot directly from a pair of  FASTA/FASTQ files without having to run nucmer or any other alignment manually.
+Very simple and configurable all-in-one dotplot program. Only very basic system dependencies such as build tools are required. Create a dotplot directly from a pair of  FASTA/FASTQ files without having to run nucmer or any other alignment manually.
 
 ## Installation
 
@@ -15,6 +15,16 @@ make -j [n_threads]
 The executable is created in the `build` directory.
 
 Tested on macOS 11.1 and ubuntu 20.04
+
+## Dependencies
+
+You may need to install the following libraries to compile (all contained within the `build-essentials` package on ubuntu):
+
+```
+GCC compiler (g++ version >= 4.7)
+CMake >= v3.10
+C++17
+```
 
 ## Usage 
 
