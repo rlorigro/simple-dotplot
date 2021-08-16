@@ -1,5 +1,5 @@
 # simple-dotplot
-Very simple and configurable all-in-one dotplot program. Only very basic system dependencies such as build tools are required. Create a dotplot directly from a pair of  FASTA/FASTQ files without having to run nucmer or any other alignment manually.
+Very simple and configurable all-in-one dotplot program. Only very basic system dependencies such as build tools are required. Create a dotplot directly from a pair of FASTA/FASTQ files without having to run nucmer or any other alignment manually. Alternatively, if you have a PAF already (from a mapper such as minimap2), make a simple dot plot using that.
 
 ## Installation
 
