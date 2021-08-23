@@ -93,14 +93,37 @@ class PafElement:
                 if token.startswith("cg:Z:"):
                     self.cigar_operations = parse_cigar_as_tuples(token[5:])
 
+    def __str__(self):
+        s = "query_name: " + str(self.query_name) + '\n' + \
+            "ref_name: " + str(self.ref_name) + '\n' + \
+            "query_length: " + str(self.query_length) + '\n' + \
+            "ref_length: " + str(self.ref_length) + '\n' + \
+            "query_start: " + str(self.query_start) + '\n' + \
+            "query_stop: " + str(self.query_stop) + '\n' + \
+            "ref_start: " + str(self.ref_start) + '\n' + \
+            "ref_stop: " + str(self.ref_stop) + '\n' + \
+            "map_quality: " + str(self.map_quality) + '\n' + \
+            "reversal:" + str(self.reversal)
+
+        return s
+
 
 def plot_abridged_alignment(paf_element, axes):
     viridis = cm.get_cmap('viridis', 256)
 
-    x1 = paf_element.ref_start
-    x2 = paf_element.ref_stop
+    if paf_element.reversal:
+        x1 = paf_element.ref_stop
+        x2 = paf_element.ref_start
+
+    else:
+        x1 = paf_element.ref_start
+        x2 = paf_element.ref_stop
+
     y1 = paf_element.query_start
     y2 = paf_element.query_stop
+
+    print(paf_element)
+    print("x:", x1,x2, "y:", y1,y2)
 
     color = viridis((60 - paf_element.map_quality)/60)
     axes.plot([x1,x2], [y1,y2], color=color, linewidth=0.5)
