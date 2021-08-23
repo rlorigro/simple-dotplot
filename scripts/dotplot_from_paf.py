@@ -108,9 +108,7 @@ class PafElement:
         return s
 
 
-def plot_abridged_alignment(paf_element, axes):
-    viridis = cm.get_cmap('viridis', 256)
-
+def plot_abridged_alignment(paf_element, axes, use_random_color):
     if paf_element.reversal:
         x1 = paf_element.ref_stop
         x2 = paf_element.ref_start
@@ -125,8 +123,12 @@ def plot_abridged_alignment(paf_element, axes):
     print(paf_element)
     print("x:", x1,x2, "y:", y1,y2)
 
-    color = viridis((60 - paf_element.map_quality)/60)
-    axes.plot([x1,x2], [y1,y2], color=color, linewidth=0.5)
+    if use_random_color:
+        l = axes.plot([x1,x2], [y1,y2], linewidth=1)
+    else:
+        viridis = cm.get_cmap('viridis', 256)
+        color = viridis((60 - paf_element.map_quality)/60)
+        axes.plot([x1,x2], [y1,y2], color=color, linewidth=1)
 
 
 def plot_full_alignment(paf_element, axes):
@@ -162,7 +164,7 @@ def plot_full_alignment(paf_element, axes):
             axes.plot([x1,x2], [y1,y2], color=colors[operation[0]], linewidth=0.5)
 
 
-def dotplot_from_paf(paf_path, use_full_alignment):
+def dotplot_from_paf(paf_path, use_full_alignment, use_random_color):
     figure = pyplot.figure()
     axes = pyplot.axes()
 
@@ -185,7 +187,7 @@ def dotplot_from_paf(paf_path, use_full_alignment):
             if use_full_alignment:
                 plot_full_alignment(paf_element=paf_element, axes=axes)
             else:
-                plot_abridged_alignment(paf_element=paf_element, axes=axes)
+                plot_abridged_alignment(paf_element=paf_element, axes=axes, use_random_color=use_random_color)
 
     axes.set_aspect('equal')
     axes.set_ylim([0,ref_length])
@@ -216,7 +218,14 @@ if __name__ == "__main__":
         action="store_true",
         help="Add this boolean flag to optionally parse and plot the full base-level alignment (can be prohibitively slow)"
     )
+    parser.add_argument(
+        "--random_color","-r",
+        dest="random_color",
+        required=False,
+        action="store_true",
+        help="Add this boolean flag to optionally plot all alignments with a random individual color (as default matplotlib color cycle)"
+    )
 
     args = parser.parse_args()
 
-    dotplot_from_paf(args.i, use_full_alignment=args.use_cigar)
+    dotplot_from_paf(args.i, use_full_alignment=args.use_cigar, use_random_color=args.random_color)
