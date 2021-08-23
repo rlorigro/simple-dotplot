@@ -1,7 +1,8 @@
 from matplotlib import pyplot
 from matplotlib import cm
 import argparse
-import os
+import random
+import sys
 
 
 def parse_cigar_as_tuples(cigar_string):
@@ -108,7 +109,7 @@ class PafElement:
         return s
 
 
-def plot_abridged_alignment(paf_element, axes, use_random_color):
+def plot_abridged_alignment(paf_element, axes, use_random_color, use_endpoints):
     if paf_element.reversal:
         x1 = paf_element.ref_stop
         x2 = paf_element.ref_start
@@ -124,11 +125,16 @@ def plot_abridged_alignment(paf_element, axes, use_random_color):
     print("x:", x1,x2, "y:", y1,y2)
 
     if use_random_color:
-        l = axes.plot([x1,x2], [y1,y2], linewidth=1)
+        hsv = cm.get_cmap('hsv', 256)
+        color = hsv(random.uniform(0,1))
+        axes.plot([x1,x2], [y1,y2], color=color, linewidth=1)
     else:
         viridis = cm.get_cmap('viridis', 256)
         color = viridis((60 - paf_element.map_quality)/60)
         axes.plot([x1,x2], [y1,y2], color=color, linewidth=1)
+
+    if use_endpoints:
+        axes.scatter([x1,x2], [y1,y2], color="black", s=0.3, zorder=sys.maxsize)
 
 
 def plot_full_alignment(paf_element, axes):
@@ -164,7 +170,7 @@ def plot_full_alignment(paf_element, axes):
             axes.plot([x1,x2], [y1,y2], color=colors[operation[0]], linewidth=0.5)
 
 
-def dotplot_from_paf(paf_path, use_full_alignment, use_random_color):
+def dotplot_from_paf(paf_path, use_full_alignment, use_random_color, use_endpoints):
     figure = pyplot.figure()
     axes = pyplot.axes()
 
@@ -187,7 +193,7 @@ def dotplot_from_paf(paf_path, use_full_alignment, use_random_color):
             if use_full_alignment:
                 plot_full_alignment(paf_element=paf_element, axes=axes)
             else:
-                plot_abridged_alignment(paf_element=paf_element, axes=axes, use_random_color=use_random_color)
+                plot_abridged_alignment(paf_element=paf_element, axes=axes, use_random_color=use_random_color, use_endpoints=use_endpoints)
 
     axes.set_aspect('equal')
     axes.set_ylim([0,ref_length])
@@ -225,7 +231,14 @@ if __name__ == "__main__":
         action="store_true",
         help="Add this boolean flag to optionally plot all alignments with a random individual color (as default matplotlib color cycle)"
     )
+    parser.add_argument(
+        "--endpoints","-e",
+        dest="endpoints",
+        required=False,
+        action="store_true",
+        help="Add this boolean flag to optionally plot black circle delimiters on the ends of alignment lines"
+    )
 
     args = parser.parse_args()
 
-    dotplot_from_paf(args.i, use_full_alignment=args.use_cigar, use_random_color=args.random_color)
+    dotplot_from_paf(args.i, use_full_alignment=args.use_cigar, use_random_color=args.random_color, use_endpoints=args.endpoints)
