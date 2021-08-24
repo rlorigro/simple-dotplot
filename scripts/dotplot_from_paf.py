@@ -181,7 +181,7 @@ def plot_full_alignment(paf_element, lines, colors):
             # axes.plot([x1,x2], [y1,y2], color=colors[operation[0]], linewidth=0.5)
 
 
-def dotplot_from_paf(paf_path, min_mapq, use_full_alignment, use_random_color, use_endpoints):
+def dotplot_from_paf(paf_path, min_mapq, min_length, use_full_alignment, use_random_color, use_endpoints):
     figure = pyplot.figure()
     axes = pyplot.axes()
 
@@ -204,6 +204,9 @@ def dotplot_from_paf(paf_path, min_mapq, use_full_alignment, use_random_color, u
                 exit("ERROR: more than one reference sequence in PAF file")
 
             if paf_element.map_quality < min_mapq:
+                continue
+
+            if abs(paf_element.ref_stop - paf_element.ref_start) < min_length:
                 continue
 
             if use_full_alignment:
@@ -256,6 +259,13 @@ if __name__ == "__main__":
         help="Minimum map quality to plot"
     )
     parser.add_argument(
+        "--min_length","-l",
+        type=int,
+        required=False,
+        default=0,
+        help="Minimum length alignment (in ref coord) to plot"
+    )
+    parser.add_argument(
         "--use_cigar","-c",
         dest="use_cigar",
         required=False,
@@ -279,4 +289,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    dotplot_from_paf(args.i, min_mapq=args.min_mapq, use_full_alignment=args.use_cigar, use_random_color=args.random_color, use_endpoints=args.endpoints)
+    dotplot_from_paf(args.i, min_mapq=args.min_mapq, min_length=args.min_length, use_full_alignment=args.use_cigar, use_random_color=args.random_color, use_endpoints=args.endpoints)
