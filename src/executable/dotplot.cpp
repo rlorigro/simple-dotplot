@@ -50,6 +50,9 @@ char complement(char c){
     else if (c == 'T'){
         return 'A';
     }
+    else if (c == 'N'){
+        return 'N';
+    }
     else {
         throw runtime_error("ERROR: non DNA character cannot be complemented: " + string(1,c));
     }
@@ -68,10 +71,11 @@ void reverse_complement(string& sequence, string& rc_sequence){
 int64_t find_matches(string& ref_sequence,
                   string& query_sequence,
                   int64_t min_length,
+                  bool both_strands,
                   vector<mummer::mummer::match_t>& matches
                   ){
 
-    auto matcher = mummer::mummer::sparseSA::create_auto(ref_sequence.c_str(), ref_sequence.size(), 0, true);
+    auto matcher = mummer::mummer::sparseSA::create_auto(ref_sequence.c_str(), ref_sequence.size(), min_length, true);
 
     IterativeSummaryStats<double> accumulator;
 
@@ -82,6 +86,18 @@ int64_t find_matches(string& ref_sequence,
             accumulator.add(double(match.ref)/1000.0);
         }
     });
+
+    if (both_strands) {
+        string query_sequence_rc;
+        reverse_complement(query_sequence, query_sequence_rc);
+        matcher.findMEM_each(query_sequence_rc, min_length, true, [&](const mummer::mummer::match_t& match) {
+            matches.emplace_back(match);
+
+            for (int64_t m = 0; m < match.len; m += 50) {
+                accumulator.add(double(match.ref) / 1000.0);
+            }
+        });
+    }
 
     return accumulator.get_mean();
 }
@@ -204,6 +220,7 @@ template <class T, class T2> void fasta_or_fastq_dotplot(
         T2& query_reader,
         uint32_t min_length,
         bool mask_diagonal,
+        bool both_strands,
         path output_directory,
         bool autosort=false){
 
@@ -241,7 +258,7 @@ template <class T, class T2> void fasta_or_fastq_dotplot(
 
             vector <mummer::mummer::match_t> matches;
 
-            int64_t mean_x_value = find_matches(ref_sequences[i], query_sequences[j], min_length, matches);
+            int64_t mean_x_value = find_matches(ref_sequences[i], query_sequences[j], min_length, both_strands, matches);
 
             if (matches.empty()){
                 cerr << "WARNING: no matches found for query: " << query_names[j] << '\n';
@@ -279,7 +296,7 @@ template <class T, class T2> void fasta_or_fastq_dotplot(
 }
 
 
-void dotplot(path ref_path, path query_path, int64_t min_length, bool mask_diagonal, path output_directory){
+void dotplot(path ref_path, path query_path, int64_t min_length, bool mask_diagonal, bool both_strands, path output_directory){
 
     if (exists(output_directory)){
         throw runtime_error("ERROR: output directory already exists");
@@ -292,25 +309,25 @@ void dotplot(path ref_path, path query_path, int64_t min_length, bool mask_diago
         FastqIterator ref_reader(ref_path);
         FastqIterator query_reader(query_path);
 
-        fasta_or_fastq_dotplot(ref_reader, query_reader, min_length, mask_diagonal, output_directory);
+        fasta_or_fastq_dotplot(ref_reader, query_reader, min_length, mask_diagonal, both_strands, output_directory);
     }
     else if (ref_path.extension() == ".fasta" and query_path.extension() == ".fasta"){
         FastaReader ref_reader(ref_path);
         FastaReader query_reader(query_path);
 
-        fasta_or_fastq_dotplot(ref_reader, query_reader, min_length, mask_diagonal, output_directory);
+        fasta_or_fastq_dotplot(ref_reader, query_reader, min_length, mask_diagonal, both_strands, output_directory);
     }
     else if (ref_path.extension() == ".fasta" and query_path.extension() == ".fastq"){
         FastaReader ref_reader(ref_path);
         FastqIterator query_reader(query_path);
 
-        fasta_or_fastq_dotplot(ref_reader, query_reader, min_length, mask_diagonal, output_directory);
+        fasta_or_fastq_dotplot(ref_reader, query_reader, min_length, mask_diagonal, both_strands, output_directory);
     }
     else if (ref_path.extension() == ".fastq" and query_path.extension() == ".fasta"){
         FastqIterator ref_reader(ref_path);
         FastaReader query_reader(query_path);
 
-        fasta_or_fastq_dotplot(ref_reader, query_reader, min_length, mask_diagonal, output_directory);
+        fasta_or_fastq_dotplot(ref_reader, query_reader, min_length, mask_diagonal, both_strands, output_directory);
     }
     else{
         throw runtime_error("ERROR: file extensions do not match '.fastq' or '.fasta'");
@@ -323,6 +340,7 @@ int main(int argc, char* argv[]){
     path query_path;
     int64_t min_length;
     bool mask_diagonal = false;
+    bool both_strands = false;
     path output_directory;
 
     CLI::App app{"App description"};
@@ -339,12 +357,14 @@ int main(int argc, char* argv[]){
 
     app.add_flag("--mask_diagonal", mask_diagonal, "Whether to zero all diagonal entries. \nUseful for self-dotplots, which have an extreme outlier on the diagonal");
 
+    app.add_flag("--both_strands", both_strands, "Whether to query both strands. \nBy default, only the forward matches are tested, set this flag to search both reverse complements");
+
     app.add_option("-o,--output_dir", output_directory, "Path of directory to save output")
         ->required();
 
     CLI11_PARSE(app, argc, argv);
 
-    dotplot(ref_path, query_path, min_length, mask_diagonal, output_directory);
+    dotplot(ref_path, query_path, min_length, mask_diagonal, both_strands, output_directory);
 
     return 0;
 }
