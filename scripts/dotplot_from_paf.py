@@ -75,7 +75,7 @@ def get_ref_alignment_length(cigar_operations):
 
 class PafElement:
     def __init__(self, paf_line, store_cigar=False):
-        tokens = paf_line.strip().split('\t')
+        tokens = paf_line.strip().split()
 
         self.query_name = tokens[0]
         self.ref_name = tokens[5]
@@ -170,7 +170,7 @@ def plot_full_alignment(paf_element, axes):
             axes.plot([x1,x2], [y1,y2], color=colors[operation[0]], linewidth=0.5)
 
 
-def dotplot_from_paf(paf_path, use_full_alignment, use_random_color, use_endpoints):
+def dotplot_from_paf(paf_path, min_mapq, use_full_alignment, use_random_color, use_endpoints):
     figure = pyplot.figure()
     axes = pyplot.axes()
 
@@ -181,13 +181,16 @@ def dotplot_from_paf(paf_path, use_full_alignment, use_random_color, use_endpoin
         for l,line in enumerate(file):
             paf_element = PafElement(paf_line=line, store_cigar=use_full_alignment)
 
+            print(l)
+            print(paf_element)
+
             ref_names.add(paf_element.ref_name)
             ref_length = paf_element.ref_length
 
             if len(ref_names) > 1:
                 exit("ERROR: more than one reference sequence in PAF file")
 
-            if paf_element.map_quality < 1:
+            if paf_element.map_quality < min_mapq:
                 continue
 
             if use_full_alignment:
@@ -218,6 +221,13 @@ if __name__ == "__main__":
         help="Path of PAF file"
     )
     parser.add_argument(
+        "--min_mapq","-q",
+        type=int,
+        required=False,
+        default=0,
+        help="Minimum map quality to plot"
+    )
+    parser.add_argument(
         "--use_cigar","-c",
         dest="use_cigar",
         required=False,
@@ -241,4 +251,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    dotplot_from_paf(args.i, use_full_alignment=args.use_cigar, use_random_color=args.random_color, use_endpoints=args.endpoints)
+    dotplot_from_paf(args.i, min_mapq=args.min_mapq, use_full_alignment=args.use_cigar, use_random_color=args.random_color, use_endpoints=args.endpoints)
