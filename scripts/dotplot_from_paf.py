@@ -121,8 +121,8 @@ def plot_abridged_alignment(paf_element, axes, use_random_color, use_endpoints):
     y1 = paf_element.query_start
     y2 = paf_element.query_stop
 
-    print(paf_element)
-    print("x:", x1,x2, "y:", y1,y2)
+    # print(paf_element)
+    # print("x:", x1,x2, "y:", y1,y2)
 
     if use_random_color:
         hsv = cm.get_cmap('hsv', 256)
@@ -180,9 +180,6 @@ def dotplot_from_paf(paf_path, min_mapq, use_full_alignment, use_random_color, u
     with open(paf_path, 'r') as file:
         for l,line in enumerate(file):
             paf_element = PafElement(paf_line=line, store_cigar=use_full_alignment)
-
-            print(l)
-            print(paf_element)
 
             ref_names.add(paf_element.ref_name)
             ref_length = paf_element.ref_length
