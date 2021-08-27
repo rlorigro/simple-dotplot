@@ -226,9 +226,9 @@ def plot_abridged_alignment(paf_element, lines, colors, dots_x, dots_y, use_rand
         data = paf_element.get_data_by_column(color_index)
 
         if color_scale_max is not None:
-            color = HSV_COLORMAP((float(data) + 1e-9)/color_scale_max)
+            color = GNUPLOT_COLORMAP((float(data) + 1e-9)/color_scale_max)
         else:
-            color = GNUPLOT_COLORMAP(str_to_float(data))
+            color = HSV_COLORMAP(str_to_float(data))
 
         colors.append(color)
 
