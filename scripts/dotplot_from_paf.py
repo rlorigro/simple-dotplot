@@ -442,8 +442,8 @@ if __name__ == "__main__":
         required=False,
         default="11",
         help="Which data in the PAF to color the alignments with. If a string, it must indicate a tag (e.g. 'cm') "
-             "and that tag must be found past column 12 (1-based) and be followed by a colon. If a number (integer), "
-             "it must indicate the (1-based) column in which the data is expected to be found."
+             "and that tag must be found past column 11 (0-based) and be followed by a colon. If a number (integer), "
+             "it must indicate the (0-based) column in which the data is expected to be found."
     )
     parser.add_argument(
         "--scalar_color",
