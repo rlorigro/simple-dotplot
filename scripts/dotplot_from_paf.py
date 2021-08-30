@@ -228,7 +228,7 @@ def plot_abridged_alignment(paf_element, lines, colors, dots_x, dots_y, use_rand
         if color_scale_max is not None:
             color = GNUPLOT_COLORMAP((float(data) + 1e-9)/color_scale_max)
         else:
-            color = HSV_COLORMAP(str_to_float(data))
+            color = HSV_COLORMAP(str_to_float(str(data)))
 
         colors.append(color)
 
@@ -268,7 +268,6 @@ def plot_full_alignment(paf_element, lines, colors, dots_x, dots_y, color_index,
         else:
             # Interpret as a deterministic function of string (by default)
             color = HSV_COLORMAP(str_to_float(data))
-
 
     cigar_operations = paf_element.get_cigar()
     if paf_element.get_reversal():
@@ -440,7 +439,7 @@ if __name__ == "__main__":
         "--color_by",
         type=str,
         required=False,
-        default="11",
+        default="0",
         help="Which data in the PAF to color the alignments with. If a string, it must indicate a tag (e.g. 'cm') "
              "and that tag must be found past column 11 (0-based) and be followed by a colon. If a number (integer), "
              "it must indicate the (0-based) column in which the data is expected to be found."
