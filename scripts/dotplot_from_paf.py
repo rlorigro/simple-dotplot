@@ -267,7 +267,7 @@ def plot_full_alignment(paf_element, lines, colors, dots_x, dots_y, color_index,
             color = GNUPLOT_COLORMAP((float(data) + 1e-9)/color_scale_max)
         else:
             # Interpret as a deterministic function of string (by default)
-            color = HSV_COLORMAP(str_to_float(data))
+            color = HSV_COLORMAP(str_to_float(str(data)))
 
     cigar_operations = paf_element.get_cigar()
     if paf_element.get_reversal():
