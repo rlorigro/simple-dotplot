@@ -414,7 +414,7 @@ def dotplot_from_paf(paf_path,
             divider = make_axes_locatable(axes)
             cax = divider.append_axes("right", size="5%", pad=0.05)
 
-            colorbar_tick_labels = numpy.linspace(0, color_scale_max, 10)
+            colorbar_tick_labels = [round(x,3) for x in numpy.linspace(0, color_scale_max, 10)]
             colorbar_ticks = numpy.linspace(0, 1, 10)
             print(colorbar_ticks)
 
