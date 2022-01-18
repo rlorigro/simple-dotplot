@@ -212,6 +212,25 @@ void plot_matches_as_heatmap(
         }
         file << '\n';
     }
+
+    // Write raw matrix to csv for purpose of replotting with any colormap/normalization
+    path csv_path = output_path.replace_extension(".csv");
+    ofstream csv_file(csv_path);
+
+    if (not (file.good() and file.is_open())){
+        throw runtime_error("ERROR: could not write to file: " + csv_path.string());
+    }
+
+    for (size_t i=0; i<size; i++){
+        for (size_t j=0; j<size; j++){
+            csv_file << matrix[i][j];
+            if (j < matrix.size() - 1){
+                csv_file << ',';
+            }
+        }
+        csv_file << '\n';
+    }
+
 }
 
 
