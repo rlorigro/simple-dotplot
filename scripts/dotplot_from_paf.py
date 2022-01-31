@@ -43,7 +43,7 @@ def parse_cigar_as_tuples(cigar_string):
     prev_is_numeric = True
 
     for i,c in enumerate(cigar_string):
-        if c.isalpha():
+        if c.isalpha() or c == '=':
             if i > 0 and not prev_is_numeric:
                 exit("ERROR: cigar string contains impossible sequence of numeric and alphabetic characters")
 
