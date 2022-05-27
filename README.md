@@ -65,6 +65,17 @@ With `min_length=1024` (runtime: 0m 1s)
 With `min_length=16` (runtime: 7m 48s)
 ![image](https://user-images.githubusercontent.com/28764332/124677724-e89bda00-de75-11eb-9e4e-3abb2b462ce9.png)
 
+Now you can also re-color plots by saving the results of the comparison as a table, and plotting separately with python:
+```
+./build/dotplot --ref /home/ryan/data/censat2021/1.chm13.cenX.fasta --query /home/ryan/data/censat2021/1.chm13.cenX.fasta -l 1024 -o test_dotplot_csv
+
+ python3 scripts/plot_csv.py -i /home/ryan/code/simple-dotplot/build/test_dotplot_csv/1.chm13.cenX_VS_chrX_57820107_60927026_dotplot.csv
+```
+By editing the script provided, you may choose any available colormap in matplotlib and truncate them (to select a starting and ending point in the gradient).
+
+![image](https://user-images.githubusercontent.com/28764332/168344211-02eb5b17-9722-4d10-a660-29a82237923d.png)
+
+
 ### Python PAF dot plotter
 
 Coloring by a custom tag in the paf (`--color_by [tag_name]`)
