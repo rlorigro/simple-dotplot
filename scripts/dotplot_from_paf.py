@@ -159,6 +159,7 @@ def dotplot_from_paf(paf_path,
                      min_mapq,
                      min_length,
                      linewidth,
+                     alpha,
                      color_by,
                      color_scale_max,
                      use_full_alignment,
@@ -229,7 +230,7 @@ def dotplot_from_paf(paf_path,
         figure = figures_per_alignment_pair[pair_identifier]
         axes = figure.add_subplot()
 
-        line_collection = collections.LineCollection(data.lines, colors=data.colors, linewidths=linewidth)
+        line_collection = collections.LineCollection(data.lines, colors=data.colors, linewidths=linewidth, alpha=alpha)
         axes.add_collection(line_collection)
 
         axes.scatter(data.dots_x, data.dots_y, color="black", s=0.3, zorder=sys.maxsize)
@@ -314,6 +315,13 @@ if __name__ == "__main__":
         help="Width of lines in plot"
     )
     parser.add_argument(
+        "--alpha","-a",
+        type=float,
+        required=False,
+        default=0.7,
+        help="Alpha value (opacity) for lines in the plot"
+    )
+    parser.add_argument(
         "--use_cigar","-c",
         dest="use_cigar",
         required=False,
@@ -341,6 +349,7 @@ if __name__ == "__main__":
                      min_mapq=args.min_mapq,
                      min_length=args.min_length,
                      linewidth=args.width,
+                     alpha=args.alpha,
                      color_by=args.color_by,
                      color_scale_max=args.scalar_color,
                      use_full_alignment=args.use_cigar,
