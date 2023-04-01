@@ -3,6 +3,10 @@ Very simple and configurable all-in-one dotplot program. Only very basic system 
 
 ## Installation
 
+
+**NOTE**: to use the python code (PAF plotting) you don't need to compile, just clone the repository and run `python3 scripts/dotplot_from_paf.py`
+
+
 ```
 git clone https://github.com/rlorigro/simple-dotplot.git
 cd simple-dotplot
