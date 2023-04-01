@@ -233,7 +233,7 @@ def dotplot_from_paf(paf_path,
         line_collection = collections.LineCollection(data.lines, colors=data.colors, linewidths=linewidth, alpha=alpha)
         axes.add_collection(line_collection)
 
-        axes.scatter(data.dots_x, data.dots_y, color="black", s=0.3, zorder=sys.maxsize)
+        axes.scatter(data.dots_x, data.dots_y, color="black", s=linewidth/2, zorder=sys.maxsize)
 
         axes.set_aspect('equal')
         axes.set_ylim([0,lengths_per_alignment_pair[pair_identifier]])
