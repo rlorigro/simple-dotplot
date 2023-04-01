@@ -21,9 +21,9 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     return new_cmap
 
 
-HSV_COLORMAP = cm.get_cmap('hsv', 256)
-GNUPLOT_COLORMAP = truncate_colormap(cm.get_cmap('gnuplot2', 256), minval=0.12, maxval=0.80)
-VIRIDIS_COLORMAP = cm.get_cmap('viridis', 256)
+HSV_COLORMAP = matplotlib.colormaps['hsv']
+GNUPLOT_COLORMAP = truncate_colormap(matplotlib.colormaps['gnuplot2'], minval=0.12, maxval=0.80)
+VIRIDIS_COLORMAP = matplotlib.colormaps['viridis']
 
 
 """
@@ -74,12 +74,12 @@ def plot_full_alignment(paf_element, plot_data, color_index, color_scale_max, us
               'I':"orange",
               'D':"orange",
               '=':"blue",
-              'X':"purple",
+              'X':"red",
               'S':"black",
               'H':"black"}
 
-    print(paf_element.get_query_name(), paf_element.get_ref_name(), paf_element.get_reversal(), paf_element.get_ref_start())
-    print(paf_element.get_cigar()[:10])
+    # print(paf_element.get_query_name(), paf_element.get_ref_name(), paf_element.get_reversal(), paf_element.get_ref_start())
+    # print(paf_element.get_cigar()[:10])
 
     ref_index = paf_element.get_ref_start()
     query_index = paf_element.get_query_start()
@@ -158,6 +158,7 @@ class PlotData:
 def dotplot_from_paf(paf_path,
                      min_mapq,
                      min_length,
+                     linewidth,
                      color_by,
                      color_scale_max,
                      use_full_alignment,
@@ -186,7 +187,7 @@ def dotplot_from_paf(paf_path,
                 if color_index is None:
                     if color_by.isdigit():
                         color_index = int(color_by)
-                    elif color_by.isalnum():
+                    else:
                         color_index = paf_element.find_tag_index(color_by)
 
                     data = paf_element.get_data_by_column(color_index)
@@ -195,6 +196,9 @@ def dotplot_from_paf(paf_path,
                     if color_scale_max is not None:
                         if type(data) == str and not data.isnumeric():
                             exit("ERROR: cannot interpret data as numeric: \n\t" + data)
+
+            elif not use_full_alignment:
+                color_index = 0
 
             lengths_per_alignment_pair[pair_identifier] = max(paf_element.get_ref_length(), paf_element.get_query_length())
 
@@ -225,7 +229,7 @@ def dotplot_from_paf(paf_path,
         figure = figures_per_alignment_pair[pair_identifier]
         axes = figure.add_subplot()
 
-        line_collection = collections.LineCollection(data.lines, colors=data.colors, linewidths=1.2)
+        line_collection = collections.LineCollection(data.lines, colors=data.colors, linewidths=linewidth)
         axes.add_collection(line_collection)
 
         axes.scatter(data.dots_x, data.dots_y, color="black", s=0.3, zorder=sys.maxsize)
@@ -273,7 +277,7 @@ if __name__ == "__main__":
         "--color_by",
         type=str,
         required=False,
-        default="0",
+        default=None,
         help="Which data in the PAF to color the alignments with. If a string, it must indicate a tag (e.g. 'cm') "
              "and that tag must be found past column 11 (0-based) and be followed by a colon. If a number (integer), "
              "it must indicate the (0-based) column in which the data is expected to be found."
@@ -303,6 +307,13 @@ if __name__ == "__main__":
         help="Minimum length alignment (in ref coord) to plot"
     )
     parser.add_argument(
+        "--width","-w",
+        type=float,
+        required=False,
+        default=1.2,
+        help="Width of lines in plot"
+    )
+    parser.add_argument(
         "--use_cigar","-c",
         dest="use_cigar",
         required=False,
@@ -329,6 +340,7 @@ if __name__ == "__main__":
     dotplot_from_paf(args.i,
                      min_mapq=args.min_mapq,
                      min_length=args.min_length,
+                     linewidth=args.width,
                      color_by=args.color_by,
                      color_scale_max=args.scalar_color,
                      use_full_alignment=args.use_cigar,

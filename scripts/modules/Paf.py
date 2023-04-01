@@ -1,3 +1,4 @@
+import sys
 
 
 def parse_cigar_as_tuples(cigar_string):
@@ -163,6 +164,8 @@ class PafElement:
         for t,token in enumerate(self.tokens[12:]):
             if token.startswith(tag_prefix):
                 return 12 + t
+
+        exit("ERROR: tag not found: " + tag_prefix)
 
     def find_tag(self, tag_substring):
         for token in self.tokens[12:]:
